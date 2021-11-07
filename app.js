@@ -101,6 +101,47 @@ function buildbubbleChart(sample) {
 
 }
 
+function buildgauge(sample) {
+        d3.json("samples.json").then(function(data) {
+            var metadata = data.metadata;
+            var resultsArray = metadata.filter(sampleObject => 
+                sampleObject.id == sample);
+            var result = resultsArray[0];
+        var bubbleids = result.otu_ids;
+        var wash = result.wfreq;
+        console.log(wash)
+
+    // Create a bubble chart
+
+    var data = [
+        {
+          domain: { x: [0, 1], y: [0, 1] },
+          value: wash,
+          title: " Weekly Bellly Button Washes" ,
+          type: "indicator",
+          mode: "gauge+number",
+          delta: { reference: 2.83 },
+          gauge: {
+            axis: { range: [null, 10], dtick: 1  },
+            steps: [
+              { range: [0, 10], color: "lightgray" }
+            ],
+            threshold: {
+              line: { color: "black", width: 3 },
+              //thickness: 5.75,
+              value: wash,
+            }
+          }
+        }
+      ];
+      
+      var layout = { width: 600, height: 450, margin: { t: 0, b: 0 } };
+      Plotly.newPlot('gauge', data, layout);
+
+    });
+
+}
+
 function init() {
     // select the dropdown select element
     var selector = d3.select("#selDataset");
@@ -118,6 +159,7 @@ function init() {
         // Use the first sample from the list to build the initial plots
         const firstSample = sampleNames[0];
         buildbarCharts(firstSample);
+        buildgauge(firstSample);
         buildbubbleChart(firstSample);
         buildMetadata(firstSample);
     });
@@ -126,6 +168,7 @@ function init() {
     function optionChanged(newSample) {
     // Fetch new data each time a new sample is selected
     buildbarCharts(newSample);
+    buildgauge(newSample);
     buildbubbleChart(newSample);
     buildMetadata(newSample);
     }
